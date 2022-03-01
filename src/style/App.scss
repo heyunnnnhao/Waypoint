@@ -1,9 +1,15 @@
 .App {
   height: 200vh;
   width: 200vw;
+  position: relative;
   .content {
     background-color: teal;
     width: 20vw;
     height: 10vh;
+  }
+  .status {
+    position: absolute;
+    top: 20vh;
+    left: 60vw;
   }
 }
