@@ -1,22 +1,43 @@
 {
   "name": "waypoint",
-  "version": "0.0.0",
-  "scripts": {
-    "dev": "vite --host",
-    "build": "tsc && vite build",
-    "preview": "vite preview"
+  "version": "1.0.0",
+  "author": "heyunhao",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
   },
-  "dependencies": {
-    "intersection-observer": "^0.12.0",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2"
+  "scripts": {
+    "build": "npm run clean && npm run type:dts && npm run type:build",
+    "clean": "rimraf dist",
+    "type:dts": "tsc --emitDeclarationOnly",
+    "type:check": "tsc --noEmit",
+    "type:build": "ts-node ./build",
+    "format": "prettier \"src/**/*.ts\" --write",
+    "format:check": "prettier \"src/**/*.ts\" --check",
+    "lint": "eslint src --ext .ts --fix",
+    "lint:check": "eslint src --ext .ts"
   },
   "devDependencies": {
+    "@types/node": "^17.0.23",
     "@types/react": "^17.0.33",
     "@types/react-dom": "^17.0.10",
-    "@vitejs/plugin-react": "^1.0.7",
-    "sass": "^1.49.8",
-    "typescript": "^4.4.4",
-    "vite": "^2.7.2"
-  }
+    "@typescript-eslint/eslint-plugin": "^5.16.0",
+    "@typescript-eslint/parser": "^5.16.0",
+    "esbuild": "^0.14.28",
+    "esbuild-node-externals": "^1.4.1",
+    "eslint": "^8.12.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-eslint-comments": "^3.2.0",
+    "eslint-plugin-import": "^2.25.4",
+    "prettier": "^2.6.1",
+    "rimraf": "^3.0.2",
+    "ts-node": "^10.7.0",
+    "typescript": "^4.6.3"
+  },
+  "files": [
+    "dist"
+  ]
 }

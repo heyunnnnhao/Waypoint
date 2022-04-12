@@ -1,37 +1,66 @@
-import { useState, useEffect, useRef } from 'react';
-import 'intersection-observer'
+import { useState, useEffect, useRef, cloneElement, isValidElement } from 'react';
 
-interface WaypointProp {
-  children?: any;
-  onEnter: () => any;
-  onLeave: () => any;
+const clientHeight = window.innerHeight;
+const clientWidth = window.innerWidth;
+
+export interface WaypointProps {
+  children?: JSX.Element;
+  onEnter?: () => any;
+  debug?: boolean;
+  once?: boolean;
 }
 
-export default function Waypoint({ children, onEnter, onLeave }: WaypointProp) {
-  const waypointRef = useRef(null);
-  const [inView, setinView] = useState<number>(-1);
+export default function Waypoint({ children, onEnter, debug, once }: WaypointProps) {
+  let waypointRef: any = useRef(null);
+  const [inView, setInView] = useState(false);
+  const [active, setActive] = useState(true);
+
+  const childrenClassName = children?.props.className ? children.props.className + ' ' : '';
+
+  const log = (str: string) => {
+    if (debug) console.log(childrenClassName, ':', str);
+  };
+
+  const listener = (e?: Event) => {
+    e && e.stopPropagation();
+    if (waypointRef.current) {
+      const { left, top, right, bottom } = waypointRef.current.getBoundingClientRect();
+      const yes = left < clientWidth && right > 0 && top < clientHeight && bottom > 0;
+      setInView(yes);
+    }
+  };
 
   useEffect(() => {
-    const element: HTMLElement | null = waypointRef.current;
-    const callback = (entries) => {
-      setinView(entries[0].isIntersecting ? 1 : 0);
+    log('Waypoint init');
+    listener();
+  }, []);
+
+  useEffect(() => {
+    if (active) {
+      window.addEventListener('scroll', listener);
+      window.addEventListener('touchmove', listener);
+    }
+    return () => {
+      window.removeEventListener('scroll', listener);
+      window.removeEventListener('touchmove', listener);
     };
-    const io = new IntersectionObserver(callback);
-    element && io.observe(element);
-    return () => io.disconnect();
-  }, [waypointRef]);
+  }, [active]);
 
   useEffect(() => {
-    if (onEnter && inView === 1) {
-      onEnter();
-    } else if (onLeave && inView === 0) {
-      onLeave();
+    log(`inView changing: ${inView ? 'in' : 'out'}`);
+    if (inView) {
+      log('onEnter triggers');
+      onEnter && onEnter();
+      once && setActive(false);
     }
   }, [inView]);
 
-  return (
-    <div ref={waypointRef} className='waypoint'>
-      {children || null}
-    </div>
-  );
+  if (active && isValidElement<any>(children)) {
+    return cloneElement(children, {
+      ref: waypointRef,
+      className: childrenClassName + 'WaypointAnchor',
+    });
+  }
+
+  return children;
 }
