@@ -4,14 +4,15 @@ const clientHeight = window.innerHeight;
 const clientWidth = window.innerWidth;
 
 export interface WaypointProps {
-  children?: JSX.Element;
+  children?: JSX.Element | undefined | null;
   onEnter?: () => any;
   debug?: boolean;
   once?: boolean;
+  topOffset?: number;
 }
 
-export default function Waypoint({ children, onEnter, debug, once }: WaypointProps) {
-  let waypointRef: any = useRef(null);
+export default function Waypoint({ children, onEnter, debug, once, topOffset = 0 }: WaypointProps): JSX.Element | null {
+  const waypointRef: any = useRef(null);
   const [inView, setInView] = useState(false);
   const [active, setActive] = useState(true);
 
@@ -25,7 +26,7 @@ export default function Waypoint({ children, onEnter, debug, once }: WaypointPro
     e && e.stopPropagation();
     if (waypointRef.current) {
       const { left, top, right, bottom } = waypointRef.current.getBoundingClientRect();
-      const yes = left < clientWidth && right > 0 && top < clientHeight && bottom > 0;
+      const yes = left < clientWidth && right > 0 && top < clientHeight && bottom > topOffset;
       setInView(yes);
     }
   };
@@ -37,12 +38,12 @@ export default function Waypoint({ children, onEnter, debug, once }: WaypointPro
 
   useEffect(() => {
     if (active) {
-      window.addEventListener('scroll', listener);
-      window.addEventListener('touchmove', listener);
+      document.addEventListener('scroll', listener);
+      document.addEventListener('touchmove', listener);
     }
     return () => {
-      window.removeEventListener('scroll', listener);
-      window.removeEventListener('touchmove', listener);
+      document.removeEventListener('scroll', listener);
+      document.removeEventListener('touchmove', listener);
     };
   }, [active]);
 
@@ -54,6 +55,8 @@ export default function Waypoint({ children, onEnter, debug, once }: WaypointPro
       once && setActive(false);
     }
   }, [inView]);
+
+  if (!children) return <span ref={waypointRef} className='WaypointAnchor' style={{ width: '100%', height: 0 }} />;
 
   if (active && isValidElement<any>(children)) {
     return cloneElement(children, {
