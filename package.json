@@ -10,13 +10,11 @@
     "access": "public"
   },
   "scripts": {
-    "build": "npm run clean && npm run type:dts && npm run type:build",
+    "build": "npm run clean && npm run type:dts & npm run type:build",
     "clean": "rimraf dist",
     "type:dts": "tsc --emitDeclarationOnly",
     "type:check": "tsc --noEmit",
     "type:build": "ts-node ./build",
-    "format": "prettier \"src/**/*.ts\" --write",
-    "format:check": "prettier \"src/**/*.ts\" --check",
     "lint": "eslint src --ext .ts --fix",
     "lint:check": "eslint src --ext .ts"
   },
@@ -32,7 +30,6 @@
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-eslint-comments": "^3.2.0",
     "eslint-plugin-import": "^2.25.4",
-    "prettier": "^2.6.1",
     "rimraf": "^3.0.2",
     "ts-node": "^10.7.0",
     "typescript": "^4.6.3"

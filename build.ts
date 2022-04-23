@@ -2,7 +2,7 @@ import path from 'path';
 import { build } from 'esbuild';
 import { nodeExternalsPlugin } from 'esbuild-node-externals';
 
-const baseConfig = {
+build({
   platform: 'node' as const,
   target: 'esnext' as const,
   bundle: true,
@@ -12,12 +12,12 @@ const baseConfig = {
   entryPoints: [path.join(__dirname, './src/index')],
   external: ['react'],
   plugins: [nodeExternalsPlugin()],
-};
-
-(async () => {
-  await build({
-    ...baseConfig,
-    format: 'esm',
-    outdir: path.join(__dirname, './dist'),
+  format: 'esm',
+  outdir: path.join(__dirname, './dist'),
+})
+  .then((res) => {
+    console.log('build sucessful', res);
+  })
+  .catch((error) => {
+    console.log(error);
   });
-})();
