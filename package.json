@@ -10,13 +10,7 @@
     "access": "public"
   },
   "scripts": {
-    "build": "npm run clean && npm run type:dts & npm run type:build",
-    "clean": "rimraf dist",
-    "type:dts": "tsc --emitDeclarationOnly",
-    "type:check": "tsc --noEmit",
-    "type:build": "ts-node ./build",
-    "lint": "eslint src --ext .ts --fix",
-    "lint:check": "eslint src --ext .ts"
+    "build": "rimraf dist && tsc --emitDeclarationOnly & ts-node ./build"
   },
   "devDependencies": {
     "@types/node": "^17.0.23",

@@ -10,9 +10,10 @@ export interface WaypointProps {
   debug?: boolean;
   once?: boolean;
   topOffset?: number;
+  uid?: number;
 }
 
-export default function Waypoint({ children, onEnter, onLeave, debug, once, topOffset = 0 }: WaypointProps): JSX.Element | null {
+export default function Waypoint({ children, onEnter, onLeave, debug, once, topOffset = 0, uid }: WaypointProps): JSX.Element | null {
   const waypointRef: any = useRef(null);
   const [inView, setInView] = useState(false);
   const [hasEntered, setHasEntered] = useState(true);
@@ -20,7 +21,7 @@ export default function Waypoint({ children, onEnter, onLeave, debug, once, topO
   const childrenClassName = children?.props.className ? children.props.className + ' ' : '';
 
   const log = (str: string) => {
-    if (debug) console.log(childrenClassName, ':', str);
+    if (debug) console.log(childrenClassName, uid || '', ':', str);
   };
 
   const listener = (e?: Event) => {
