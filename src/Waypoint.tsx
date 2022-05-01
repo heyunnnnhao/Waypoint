@@ -6,15 +6,16 @@ const clientWidth = window.innerWidth;
 export interface WaypointProps {
   children?: JSX.Element | undefined | null;
   onEnter?: () => any;
+  onLeave?: () => any;
   debug?: boolean;
   once?: boolean;
   topOffset?: number;
 }
 
-export default function Waypoint({ children, onEnter, debug, once, topOffset = 0 }: WaypointProps): JSX.Element | null {
+export default function Waypoint({ children, onEnter, onLeave, debug, once, topOffset = 0 }: WaypointProps): JSX.Element | null {
   const waypointRef: any = useRef(null);
   const [inView, setInView] = useState(false);
-  const [active, setActive] = useState(true);
+  const [hasEntered, setHasEntered] = useState(true);
 
   const childrenClassName = children?.props.className ? children.props.className + ' ' : '';
 
@@ -37,7 +38,7 @@ export default function Waypoint({ children, onEnter, debug, once, topOffset = 0
   }, []);
 
   useEffect(() => {
-    if (active) {
+    if (!hasEntered) {
       document.addEventListener('scroll', listener);
       document.addEventListener('touchmove', listener);
     }
@@ -45,20 +46,23 @@ export default function Waypoint({ children, onEnter, debug, once, topOffset = 0
       document.removeEventListener('scroll', listener);
       document.removeEventListener('touchmove', listener);
     };
-  }, [active]);
+  }, [hasEntered, listener]);
 
   useEffect(() => {
     log(`inView changing: ${inView ? 'in' : 'out'}`);
     if (inView) {
       log('onEnter triggers');
       onEnter && onEnter();
-      once && setActive(false);
+      once && setHasEntered(true);
+    } else if (!inView && hasEntered) {
+      log('onLeave triggers');
+      onLeave && onLeave();
     }
   }, [inView]);
 
   if (!children) return <span ref={waypointRef} className='WaypointAnchor' style={{ width: '100%', height: 0 }} />;
 
-  if (active && isValidElement<any>(children)) {
+  if (!(once && hasEntered) && isValidElement<any>(children)) {
     return cloneElement(children, {
       ref: waypointRef,
       className: childrenClassName + 'WaypointAnchor',
