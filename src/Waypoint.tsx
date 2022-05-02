@@ -13,7 +13,7 @@ export interface WaypointProps {
   uid?: number;
 }
 
-export default function Waypoint({ children, onEnter, onLeave, debug, once, topOffset = 0, uid }: WaypointProps): JSX.Element | null {
+export default function Waypoint({ children, onEnter, onLeave, debug, once, topOffset = 0, uid }: WaypointProps): any {
   const waypointRef: any = useRef(null);
   const [inView, setInView] = useState(false);
   const [hasEntered, setHasEntered] = useState(true);
@@ -34,7 +34,7 @@ export default function Waypoint({ children, onEnter, onLeave, debug, once, topO
   };
 
   useEffect(() => {
-    log('Waypoint init');
+    log(`Waypoint init - ${uid} - ${topOffset}px topOffset - ${once ? 'once' : 'repeat'}`);
     listener();
   }, []);
 
@@ -54,14 +54,16 @@ export default function Waypoint({ children, onEnter, onLeave, debug, once, topO
     if (inView) {
       log('onEnter triggers');
       onEnter && onEnter();
-      once && setHasEntered(true);
+      setHasEntered(true);
     } else if (!inView && hasEntered) {
       log('onLeave triggers');
       onLeave && onLeave();
     }
   }, [inView]);
 
-  if (!children) return <span ref={waypointRef} className='WaypointAnchor' style={{ width: '100%', height: 0 }} />;
+  if (!children) console.error('Waypoint requires a child element');
+
+  if (once && hasEntered) return children;
 
   if (!(once && hasEntered) && isValidElement<any>(children)) {
     return cloneElement(children, {
